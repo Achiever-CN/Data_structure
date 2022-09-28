@@ -25,26 +25,60 @@ class Linkear_table
             int length;                 //the length of all data
         }Sqlist;
 
-        Linkear_table();
-        int insret(int location);
+        Linkear_table(int nums[]);
+        int insret(int location, int num);
+        void show();
 };
 
-
-
-int Linkear_table :: insret(int location)
+Linkear_table :: Linkear_table(int nums[])
 {
-    if( location >= 1 && location <= list.length && list.length < MAXSIZE)
+    int i = 0;
+    for(; nums[i]; i++)
+    {
+        if(i < MAXSIZE)
+        {
+            list.data[i] = nums[i];
+        }
+        else
+        {
+            break;
+        }
+    }
+    list.length = i;
+}
+
+
+
+int Linkear_table :: insret(int location, int num)
+{
+    int temp;
+    location --;
+    if( location >= 1 && location < list.length && list.length < MAXSIZE)
     {
         for(int i = location; i < list.length; i++)
         {
-            
+            temp = list.data[i+1];
+            list.data[i+1] = list.data[i];
         }
+        list.data[location] = num;
     }
+    else
+    {
+        cout << "Out of range" << endl;
+        return 0;
+    }
+    return 1;
 
 
 }
 
-
+void Linkear_table :: show()
+{
+    for(int i = 0; i < list.length; i++)
+    {
+        cout << list.data[i] << ' ';
+    }
+}
 
 
 
