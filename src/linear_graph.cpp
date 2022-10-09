@@ -2,7 +2,7 @@
 
 int main(void)
 {
-        Linear_graph    list(4,5);
+        Linear_graph_without_direction    list(4,5);
         
 
         return 0;

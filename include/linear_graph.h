@@ -20,16 +20,16 @@ struct linear_graph
 };
 
 
-class Linear_graph
+class Linear_graph_without_direction
 {
         public:
-                Linear_graph(int n1, int n2);
-                ~Linear_graph();
+                Linear_graph_without_direction(int n1, int n2);
+                ~Linear_graph_without_direction();
         private:
                 linear_graph graph;
 };
 
-Linear_graph:: Linear_graph(int n1,int n2)
+Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
 {
         graph.num_vertexes = n1;
         graph.num_edgs = n2;
@@ -80,7 +80,7 @@ Linear_graph:: Linear_graph(int n1,int n2)
         }
 }
 
-Linear_graph::  ~Linear_graph()
+Linear_graph_without_direction::  ~Linear_graph_without_direction()
 {
         for(int i = 0; i < graph.list.size(); i++)
         {
@@ -91,6 +91,10 @@ Linear_graph::  ~Linear_graph()
                 cout << endl;
         }
 }
+
+
+
+
 
 
 
