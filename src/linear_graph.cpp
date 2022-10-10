@@ -2,7 +2,7 @@
 
 int main(void)
 {
-        Linear_graph_without_direction    list(4,5);
+        Linear_graph_wight    list(5,6);
         
 
         return 0;
