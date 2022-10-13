@@ -17,13 +17,13 @@ struct linear_graph
 {
         vector<string> list;            //list储存各个顶点
         vector<vector<int>> arc;        //arc用来储存紧接表，及各个顶点之间的关系
-        int num_vertexes, num_edgs;     //num_vertexes是顶点数�? num_edgs是边的总数
+        int num_vertexes, num_edgs;     //num_vertexes是顶点数, num_edgs是边的总数
 };
 
 
-
-#if 1
 //此类是无向图
+#if 1
+
 class Linear_graph_without_direction
 {
         public:
@@ -290,10 +290,10 @@ void kruskal(Linear_graph_without_direction& G)
 
 
 
-
+//此类是加权有向图
 #if 2
 
-//此类是加权有向图
+
 class Linear_graph_wight
 {
         public:
