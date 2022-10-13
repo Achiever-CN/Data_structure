@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iomanip>
 using namespace std;
 
 #define n 100
@@ -21,7 +22,7 @@ struct linear_graph
 
 
 
-
+#if 1
 //此类是无向图
 class Linear_graph_without_direction
 {
@@ -99,12 +100,18 @@ Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
 Linear_graph_without_direction::  ~Linear_graph_without_direction()
 {
         //循环打印arc数组
-
+        cout <<   "    ";
+        for(int i = 0; i < graph.num_vertexes; i++)
+        {
+                cout << graph.list[i] << "  ";
+        }
+        cout << endl;
         for(int i = 0; i < graph.list.size(); i++)
         {
+                cout << graph.list[i] << "  ";
                 for(int j = 0; j < graph.arc[0].size(); j++)
                 {
-                        cout << graph.arc[i][j] << " ";
+                        cout << setw(2) << graph.arc[i][j] << "  ";
                 }
                 cout << endl;
         }
@@ -214,6 +221,7 @@ void prim (Linear_graph_without_direction& G)
 }
 
 
+//检测一个顶点在不在被选择数组里，在返回0
 int find_num(int num, vector<int>& l)
 {       
         if(! (l.size() > 0))
@@ -226,6 +234,8 @@ int find_num(int num, vector<int>& l)
         }
         return 1;
 }
+
+//先将所有的边按权值大小排序，在不成环的情况下，选择权值较小的边
 void kruskal(Linear_graph_without_direction& G)
 {
         vector<int> begin(G.graph.num_edgs, 0);
@@ -252,17 +262,16 @@ void kruskal(Linear_graph_without_direction& G)
                 end[i] = temp_k;
                 wight[i] = min;
                 temp_arc[temp_j][temp_k] = INT_MAX;
-                // cout << begin[i] << " > " << end[i] << " = " << wight[i] << endl;
         }
 
+        //判断是否成环
         
         vector<int> selected;
         int num_edgs = 0;
         for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
         {
-                if(find_num(begin[i], selected) && find_num(end[i], selected))
+                if(find_num(begin[i], selected) || find_num(end[i], selected))
                 {
-                        selected.push_back(begin[i]);
                         selected.push_back(end[i]);
                         cout << begin[i] << " > " << end[i] << " = " << wight[i] << endl;
                         num_edgs ++;
@@ -273,6 +282,7 @@ void kruskal(Linear_graph_without_direction& G)
 }
 
 
+#endif
 
 
 
@@ -281,8 +291,7 @@ void kruskal(Linear_graph_without_direction& G)
 
 
 
-
-
+#if 2
 
 //此类是加权有向图
 class Linear_graph_wight
@@ -296,6 +305,7 @@ class Linear_graph_wight
         friend void Dfs(Linear_graph_wight &G, int i, vector<int>& visited);
         friend void Bfs(Linear_graph_wight &G);
         friend void prim (Linear_graph_wight& G);
+        friend void kruskal(Linear_graph_wight& G);
 };
 
 
@@ -354,11 +364,18 @@ Linear_graph_wight :: Linear_graph_wight(int n1, int n2)
 
 Linear_graph_wight::  ~Linear_graph_wight()
 {
+        cout <<   "    ";
+        for(int i = 0; i < graph.num_vertexes; i++)
+        {
+                cout << graph.list[i] << "  ";
+        }
+        cout << endl;
         for(int i = 0; i < graph.list.size(); i++)
         {
+                cout << graph.list[i] << "  ";
                 for(int j = 0; j < graph.arc[0].size(); j++)
                 {
-                        cout << graph.arc[i][j] << " ";
+                        cout << setw(2) <<  graph.arc[i][j] << "  ";
                 }
                 cout << endl;
         }
@@ -472,8 +489,52 @@ void prim (Linear_graph_wight& G)
 }
 
 
+//先将所有的边按权值大小排序，在不成环的情况下，选择权值较小的边
+void kruskal(Linear_graph_wight& G)
+{
+        vector<int> begin(G.graph.num_edgs, 0);
+        vector<int> end(G.graph.num_edgs, 0);
+        vector<int> wight(G.graph.num_edgs, 0);
+        vector<vector<int>> temp_arc = G.graph.arc;
+        for(int i = 0; i < G.graph.num_edgs; i++)
+        {
+                int min = INT_MAX;
+                int temp_j = 0, temp_k = 0;
+                for(int j = 0; j < G.graph.num_vertexes; j++)
+                {
+                        for(int k = j; k < G.graph.num_vertexes; k++)
+                        {
+                                if(temp_arc[j][k] <= min && temp_arc[j][k] != 0)
+                                {
+                                        min = temp_arc[j][k];
+                                        temp_j = j;
+                                        temp_k = k;
+                                }
+                        }
+                }
+                begin[i] = temp_j;
+                end[i] = temp_k;
+                wight[i] = min;
+                temp_arc[temp_j][temp_k] = INT_MAX;
+        }
 
+        
+        //判断是否成环
+        vector<int> selected;
+        int num_edgs = 0;
+        for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
+        {
+                if(find_num(begin[i], selected) || find_num(end[i], selected))
+                {
+                        selected.push_back(end[i]);
+                        cout << begin[i] << " > " << end[i] << " = " << wight[i] << endl;
+                        num_edgs ++;
+                }
+        }    
 
+}
+
+#endif
 
 
 #endif
