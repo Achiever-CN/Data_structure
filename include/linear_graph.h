@@ -583,12 +583,6 @@ void Dijkstra(string t1, string t2, Linear_graph_without_direction& G)
 
         }
 
-        
-
-
-
-
-
 
 }
 
