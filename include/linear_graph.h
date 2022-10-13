@@ -36,6 +36,7 @@ class Linear_graph_without_direction
         friend void Bfs(Linear_graph_without_direction &G);
         friend void prim (Linear_graph_without_direction& G);
         friend void kruskal(Linear_graph_without_direction& G);
+        friend void Dijkstra(string t1, string t2, Linear_graph_without_direction& G);
 };
 
 
@@ -535,6 +536,64 @@ void kruskal(Linear_graph_wight& G)
 }
 
 #endif
+
+
+
+void Dijkstra(string t1, string t2, Linear_graph_without_direction& G)
+{
+        vector<int> verts;
+        vector<int> go(G.graph.num_vertexes, INT_MAX);
+        vector<int> last(G.graph.num_vertexes);
+
+        int v_begin = -1, v_end = -1;
+        for(int i = 0; i< G.graph.num_vertexes; i++)
+        {
+                verts.push_back(i);
+                if(G.graph.list[i] == t1)
+                        v_begin = i;
+                if(G.graph.list[i] == t2)
+                        v_end = i;
+                if(v_begin != -1 && v_end != -1)
+                        break;
+        }
+
+        go[v_begin] = 0;
+        int v_v_begin = v_begin;
+        while(1)
+        {
+                for(int i = 0; i < G.graph.num_vertexes; i++)
+                {
+                        if(G.graph.arc[v_v_begin][i] != 0 && G.graph.arc[v_v_begin][i] + go[v_v_begin] < go[i])
+                        {
+                                go[i] = G.graph.arc[v_v_begin][i];
+                                last[i] = v_v_begin;
+                        }
+                }
+
+                int min = INT_MAX;
+                for(int i = 0; i < G.graph.num_vertexes; i++)
+                {
+                        if(go[i] < min)
+                        {
+                                min = go[i];
+                                v_v_begin = i;
+                        }
+                }
+
+
+        }
+
+        
+
+
+
+
+
+
+}
+
+
+
 
 
 #endif

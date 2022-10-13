@@ -6,6 +6,6 @@ int main(void)
         //  Bfs(list);
         //  prim(list);
         // kruskal(list);
-
+        Dijkstra("v0", "v4", list);
         return 0;
  }
