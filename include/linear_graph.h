@@ -9,19 +9,17 @@
 using namespace std;
 
 #define n 100
-//utf�?8
-//线性图，利用一个固定最大长度的数组来储存顶点，并储存顶点数和总边�??
-//对于无向图，只需要记录哪两个顶点之间有联�??,利用arc来储存邻接表
+
 
 struct linear_graph
 {
-        vector<string> list;            //list储存各个顶点
-        vector<vector<int>> arc;        //arc用来储存紧接表，及各个顶点之间的关系
-        int num_vertexes, num_edgs;     //num_vertexes是顶点数, num_edgs是边的总数
+        vector<string> list;            
+        vector<vector<int>> arc;        
+        int num_vertexes, num_edgs;   
 };
 
 
-//此类是无向图
+//Linear_graph_without_direction
 #if 1
 
 class Linear_graph_without_direction
@@ -37,6 +35,7 @@ class Linear_graph_without_direction
         friend void prim (Linear_graph_without_direction& G);
         friend void kruskal(Linear_graph_without_direction& G);
         friend void Dijkstra(string t1, string t2, Linear_graph_without_direction& G);
+        friend void floyd(string t1, string t2, Linear_graph_without_direction& G);
 };
 
 
@@ -45,7 +44,7 @@ Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
         graph.num_vertexes = n1;
         graph.num_edgs = n2;
         
-        //重新设置arc数组的大小，并设置初始值为0
+        //reset the arc[][],and set the initial value to 0;
 
         graph.arc.resize(n1);
         for(int i = 0; i < graph.arc.size(); i++)
@@ -54,7 +53,7 @@ Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
                 graph.arc[i].assign(n1,0);
         }
 
-        //依次输入顶点
+        //get vertex
 
         string temp;
         for(int i = 0; i < graph.num_vertexes; i++)
@@ -65,7 +64,7 @@ Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
         }
 
 
-        //以此输入各个边的顶点，此类是无向图，这里通过匹配字符串来获取下标，对arc数组进行修改
+        //Symmetric matrix
 
         for(int i = 0; i < graph.num_edgs; i ++)
         {
@@ -100,7 +99,7 @@ Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
 
 Linear_graph_without_direction::  ~Linear_graph_without_direction()
 {
-        //循环打印arc数组
+        //show the arc
         cout <<   "    ";
         for(int i = 0; i < graph.num_vertexes; i++)
         {
@@ -118,14 +117,14 @@ Linear_graph_without_direction::  ~Linear_graph_without_direction()
         }
 }
 
-//调用DFS深度搜索遍历，一条路走到黑，再回头
+//DFS traverse the Linear_graph_without_direction
 void Dfs(Linear_graph_without_direction &G, int i, vector<int>& visited)
 {
         int j; 
-        visited[i] = 1;                                         //将该点标记为遍历�?
-        cout << G.graph.list[i] << ' ';                         //打印该顶�?
+        visited[i] = 1;                                         //mark which one has been print
+        cout << G.graph.list[i] << ' ';                         //print the vert
         for(j = 0; j < G.graph.num_vertexes; j++)
-                if(G.graph.arc[i][j] != 0 && !visited[j])       //遍历与list[i]有联系的未遍历过的顶�?
+                if(G.graph.arc[i][j] != 0 && !visited[j])       //One way to the end and then back
                         Dfs(G,j,visited);
 };
 
@@ -142,7 +141,7 @@ void Dfstraverse(Linear_graph_without_direction &G)
 }
 
 
-//先第一层，再第二层，再下一层，利用队列，入队出队
+//use queue, One floor by one floor
 void Bfs(Linear_graph_without_direction &G)
 {
         vector<int> visited(G.graph.num_vertexes, 0);
@@ -181,8 +180,8 @@ void Bfs(Linear_graph_without_direction &G)
 
 }
 
-//所有已被选择的点和未被选择的点组成两个集合，找到两个集合之间的最小值，并记录下最新的被选择点，形成新的两个集合，
-//反复即可遍历所有的顶点
+
+//The shortest path between a set of selected points and a set of selected points
 void prim (Linear_graph_without_direction& G)
 {
         vector<int> selected(G.graph.num_vertexes, 0);
@@ -222,7 +221,7 @@ void prim (Linear_graph_without_direction& G)
 }
 
 
-//检测一个顶点在不在被选择数组里，在返回0
+//Check if an element is in the array
 int find_num(int num, vector<int>& l)
 {       
         if(! (l.size() > 0))
@@ -236,7 +235,8 @@ int find_num(int num, vector<int>& l)
         return 1;
 }
 
-//先将所有的边按权值大小排序，在不成环的情况下，选择权值较小的边
+
+//first, all edges are sorted according to weights, and small weighted edges that do not form loops are selected
 void kruskal(Linear_graph_without_direction& G)
 {
         vector<int> begin(G.graph.num_edgs, 0);
@@ -265,8 +265,8 @@ void kruskal(Linear_graph_without_direction& G)
                 temp_arc[temp_j][temp_k] = INT_MAX;
         }
 
-        //判断是否成环
-        
+       
+        //Detect whether it is looped or not     
         vector<int> selected;
         int num_edgs = 0;
         for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
@@ -283,6 +283,110 @@ void kruskal(Linear_graph_without_direction& G)
 }
 
 
+//Get the shortest path from one vertex to the others
+void Dijkstra(string t1, string t2, Linear_graph_without_direction& G)
+{
+        vector<int> verts(G.graph.num_vertexes,0);
+        vector<int> go(G.graph.num_vertexes, INT_MAX);
+        vector<int> last(G.graph.num_vertexes, INT_MAX);
+
+        int v_begin = 0, v_end = 4;
+        
+        verts[v_begin] = 1;
+        go[v_begin] = 0;
+        last[v_begin] = 0;
+        int v_v_begin = v_begin;
+        for(int j = 0; j < G.graph.num_vertexes; j++)
+        {
+                
+                for(int i = 0; i < G.graph.num_vertexes; i++)
+                {
+                        if(G.graph.arc[v_v_begin][i] != 0 && G.graph.arc[v_v_begin][i] + go[v_v_begin] < go[i])
+                        {
+                                go[i] = G.graph.arc[v_v_begin][i] + go[v_v_begin];
+                                last[i] = v_v_begin;
+                                
+                        }
+                }
+
+                int min = INT_MAX;
+                for(int i = 0; i < G.graph.num_vertexes; i++)
+                {
+                        if(go[i] < min && go[i] != 0 && verts[i] == 0)
+                        {
+                                min = go[i];
+                                v_v_begin = i;
+                        }
+                }
+                verts[v_v_begin] = 1;
+                v_begin = v_v_begin;
+
+
+        }
+
+
+}
+
+
+
+void floyd(string t1, string t2, Linear_graph_without_direction& G)
+{
+        vector<vector<int>> arc(G.graph.num_vertexes);
+        vector<vector<int>> path(G.graph.num_vertexes);
+        for(int i = 0; i < G.graph.num_vertexes; i++)
+        {
+                arc[i] = G.graph.arc[i];
+                // for(int j = 0; j < G.graph.num_vertexes; j++)
+                // {
+                //         if(i != j)
+                //                 if(arc[i][j] == 0)
+                //                         arc[i][j] = INT_MAX;
+                // }
+                path[i].resize(G.graph.num_vertexes, -1);
+        }
+
+        vector<vector<int>> vertex_pairs(G.graph.num_vertexes * (G.graph.num_vertexes-1));
+        int a = 0, b = 1;
+        for(int i = 0; i < vertex_pairs.size(); i ++)
+        {
+                vertex_pairs[i].resize(2);
+                if(b > G.graph.num_vertexes - 1)
+                {
+                        a++, b = 0;
+                }   
+                if(a == b)
+                        b += 1;
+                vertex_pairs[i] = {a, b};
+                b++;
+        }
+
+        for(int i = 0; i < G.graph.num_vertexes; i++)
+        {
+                for(int j = 0; j < vertex_pairs.size(); j++)
+                {
+                        if(vertex_pairs[j][0] == i || vertex_pairs[j][1] == i)
+                        {
+                                break;
+                        }
+                        int x1 = arc[vertex_pairs[j][0]][vertex_pairs[j][1]];
+                        int x2 = arc[vertex_pairs[j][0]][i];
+                        int x3 = arc[i][vertex_pairs[j][1]];
+                        if(((x1 == x2) && (x1 == 0)) || ((x1 == x3) && (x1 == 0)))
+                                break;
+                        if(x2 == 0 || x3 == 0)
+                                break;
+                        if(x1 > x2 + x3)
+                        {
+                                arc[vertex_pairs[j][0]][vertex_pairs[j][1]] = x2 + x3; 
+                                path[vertex_pairs[j][0]][vertex_pairs[j][1]] = i;
+                        }       
+                }
+        }
+
+        
+
+}
+
 #endif
 
 
@@ -291,7 +395,7 @@ void kruskal(Linear_graph_without_direction& G)
 
 
 
-//此类是加权有向图
+//Linear_graph_wight
 #if 2
 
 
@@ -307,6 +411,7 @@ class Linear_graph_wight
         friend void Bfs(Linear_graph_wight &G);
         friend void prim (Linear_graph_wight& G);
         friend void kruskal(Linear_graph_wight& G);
+        friend void Dijkstra(string t1, string t2, Linear_graph_wight& G);
 };
 
 
@@ -332,7 +437,7 @@ Linear_graph_wight :: Linear_graph_wight(int n1, int n2)
                 graph.list.push_back(temp);
         }
 
-        //此类是加权有向图
+        //get the wight
         for(int i = 0; i < graph.num_edgs; i ++)
         {
                 cout << "Please enter the vertices on both sides of the line and the wight" << endl;
@@ -383,32 +488,32 @@ Linear_graph_wight::  ~Linear_graph_wight()
 }
 
 
-//调用DFS深度搜索遍历，一条路走到黑，再回头
+//DFS traverse the Linear_graph_without_direction
 void Dfs(Linear_graph_wight &G, int i, vector<int>& visited)
 {
         int j; 
-        visited[i] = 1;                                         //将该点标记为遍历�?
-        cout << G.graph.list[i] << ' ';                         //打印该顶�?
+        visited[i] = 1;                                         //mark which one has been print
+        cout << G.graph.list[i] << ' ';                         //print the vert
         for(j = 0; j < G.graph.num_vertexes; j++)
-                if(G.graph.arc[i][j] != 0 && !visited[j])       //遍历与list[i]有联系的未遍历过的顶�?
+                if(G.graph.arc[i][j] != 0 && !visited[j])       //One way to the end and then back
                         Dfs(G,j,visited);
 };
 
 
 void Dfstraverse(Linear_graph_wight &G)
 {
-        vector<int> visited(G.graph.num_vertexes, 0);           //对visited数组初始化为0
+        vector<int> visited(G.graph.num_vertexes, 0);           //mark which one has been print
         int i;
         for(i = 0; i < G.graph.num_vertexes; i++)
         {
-                if(!visited[i])                                 //如果i对应的顶点未被遍�?
+                if(!visited[i])                                 //if dont print this one
                         Dfs(G, i, visited);
         }
         cout << endl;
 };
 
 
-//先第一层，再第二层，再下一层，利用队列，入队出队
+//use queue, One floor by one floor
 void Bfs(Linear_graph_wight &G)
 {
         vector<int> visited(G.graph.num_vertexes, 0);
@@ -449,8 +554,7 @@ void Bfs(Linear_graph_wight &G)
 
 
 
-//所有已被选择的点和未被选择的点组成两个集合，找到两个集合之间的最小值，并记录下最新的被选择点，形成新的两个集合，
-//反复即可遍历所有的顶点
+//The shortest path between a set of selected points and a set of selected points
 void prim (Linear_graph_wight& G)
 {
         vector<int> selected(G.graph.num_vertexes, 0);
@@ -490,7 +594,8 @@ void prim (Linear_graph_wight& G)
 }
 
 
-//先将所有的边按权值大小排序，在不成环的情况下，选择权值较小的边
+
+//first, all edges are sorted according to weights, and small weighted edges that do not form loops are selected
 void kruskal(Linear_graph_wight& G)
 {
         vector<int> begin(G.graph.num_edgs, 0);
@@ -520,7 +625,7 @@ void kruskal(Linear_graph_wight& G)
         }
 
         
-        //判断是否成环
+        //Detect whether it is looped or not 
         vector<int> selected;
         int num_edgs = 0;
         for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
@@ -535,56 +640,62 @@ void kruskal(Linear_graph_wight& G)
 
 }
 
-#endif
 
 
-
-void Dijkstra(string t1, string t2, Linear_graph_without_direction& G)
+//Get the shortest path from one vertex to the others
+void Dijkstra(string t1, string t2, Linear_graph_wight& G)
 {
-        vector<int> verts;
+        vector<int> verts(G.graph.num_vertexes,0);
         vector<int> go(G.graph.num_vertexes, INT_MAX);
-        vector<int> last(G.graph.num_vertexes);
+        vector<int> last(G.graph.num_vertexes, INT_MAX);
 
-        int v_begin = -1, v_end = -1;
-        for(int i = 0; i< G.graph.num_vertexes; i++)
-        {
-                verts.push_back(i);
-                if(G.graph.list[i] == t1)
-                        v_begin = i;
-                if(G.graph.list[i] == t2)
-                        v_end = i;
-                if(v_begin != -1 && v_end != -1)
-                        break;
-        }
-
+        int v_begin = 0, v_end = 4;
+        
+        verts[v_begin] = 1;
         go[v_begin] = 0;
+        last[v_begin] = 0;
         int v_v_begin = v_begin;
-        while(1)
+        for(int j = 0; j < G.graph.num_vertexes; j++)
         {
+                
                 for(int i = 0; i < G.graph.num_vertexes; i++)
                 {
                         if(G.graph.arc[v_v_begin][i] != 0 && G.graph.arc[v_v_begin][i] + go[v_v_begin] < go[i])
                         {
-                                go[i] = G.graph.arc[v_v_begin][i];
+                                go[i] = G.graph.arc[v_v_begin][i] + go[v_v_begin];
                                 last[i] = v_v_begin;
+                                
                         }
                 }
 
                 int min = INT_MAX;
                 for(int i = 0; i < G.graph.num_vertexes; i++)
                 {
-                        if(go[i] < min)
+                        if(go[i] < min && go[i] != 0 && verts[i] == 0)
                         {
                                 min = go[i];
                                 v_v_begin = i;
                         }
                 }
+                verts[v_v_begin] = 1;
+                v_begin = v_v_begin;
 
 
         }
 
 
 }
+
+
+
+
+
+
+
+#endif
+
+
+
 
 
 
