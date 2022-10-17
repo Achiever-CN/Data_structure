@@ -3,13 +3,15 @@
 
 #include <iostream>
 #include <string>
+#include <queue>
 #include <vector>
-#include <algorithm>
+// #include <algorithm>
 #include <iomanip>
+#include <stdlib.h>
 using namespace std;
 
 #define n 100
-
+#define int_max 53362
 
 struct linear_graph
 {
@@ -19,207 +21,29 @@ struct linear_graph
 };
 
 
-//Linear_graph_without_direction
-#if 1
-
-class Linear_graph_without_direction
+void print_path(int u, int v, vector<vector<int>> path, vector<string> list)
 {
-        public:
-                Linear_graph_without_direction(int n1, int n2);
-                ~Linear_graph_without_direction();
-        private:
-                linear_graph graph;
-        friend void Dfstraverse(Linear_graph_without_direction &G);
-        friend void Dfs(Linear_graph_without_direction &G, int i, vector<int>& visited);
-        friend void Bfs(Linear_graph_without_direction &G);
-        friend void prim (Linear_graph_without_direction& G);
-        friend void kruskal(Linear_graph_without_direction& G);
-        friend void Dijkstra(string t1, string t2, Linear_graph_without_direction& G);
-        friend void floyd(string t1, string t2, Linear_graph_without_direction& G);
+        if(path[u][v] == -1)
+        {
+            cout << list[u] << " -> ";    
+        }
+        else
+        {
+                int mid = path[u][v];
+                print_path(u,mid, path, list);
+                print_path(mid,v, path, list);
+
+        }
 };
 
 
-Linear_graph_without_direction:: Linear_graph_without_direction(int n1,int n2)
+int find_subscript(string t1, vector<string> list)
 {
-        graph.num_vertexes = n1;
-        graph.num_edgs = n2;
-        
-        //reset the arc[][],and set the initial value to 0;
-
-        graph.arc.resize(n1);
-        for(int i = 0; i < graph.arc.size(); i++)
-        {
-                graph.arc[i].resize(n1);
-                graph.arc[i].assign(n1,0);
-        }
-
-        //get vertex
-
-        string temp;
-        for(int i = 0; i < graph.num_vertexes; i++)
-        {
-                cout << "Please input the vertexe one by one" << endl;
-                cin >> temp;
-                graph.list.push_back(temp);
-        }
-
-
-        //Symmetric matrix
-
-        for(int i = 0; i < graph.num_edgs; i ++)
-        {
-                cout << "Please enter the vertices on both sides of the line" << endl;
-                string t1, t2;
-                int temp;
-                cin >> t1 >> t2 >> temp;
-                int x = -1, y = -1;
-                for(int j = 0; j < graph.list.size(); j++)
-                {
-                        if(graph.list[j] == t1)
-                                x = j;
-                        if(graph.list[j] == t2)
-                                y = j;
-                        if(x != -1 && y != -1) 
-                                break;
-                }
-                if(x == -1 || y== -1)
-                {
-                         cout << "input error" << endl;
-                         break;
-                }
-                else
-                {
-                        graph.arc[x][y] = temp;
-                        graph.arc[y][x] = temp;
-                }
-
-        }
-}
-
-
-Linear_graph_without_direction::  ~Linear_graph_without_direction()
-{
-        //show the arc
-        cout <<   "    ";
-        for(int i = 0; i < graph.num_vertexes; i++)
-        {
-                cout << graph.list[i] << "  ";
-        }
-        cout << endl;
-        for(int i = 0; i < graph.list.size(); i++)
-        {
-                cout << graph.list[i] << "  ";
-                for(int j = 0; j < graph.arc[0].size(); j++)
-                {
-                        cout << setw(2) << graph.arc[i][j] << "  ";
-                }
-                cout << endl;
-        }
-}
-
-//DFS traverse the Linear_graph_without_direction
-void Dfs(Linear_graph_without_direction &G, int i, vector<int>& visited)
-{
-        int j; 
-        visited[i] = 1;                                         //mark which one has been print
-        cout << G.graph.list[i] << ' ';                         //print the vert
-        for(j = 0; j < G.graph.num_vertexes; j++)
-                if(G.graph.arc[i][j] != 0 && !visited[j])       //One way to the end and then back
-                        Dfs(G,j,visited);
+        for(int i = 0; i < list.size(); i++)
+                if(list[i] == t1)
+                        return i;
+        return -1;
 };
-
-
-void Dfstraverse(Linear_graph_without_direction &G)
-{
-        vector<int> visited(G.graph.num_vertexes, 0);
-        for(int i= 0; i < G.graph.num_vertexes; i++)
-        {
-                if(!visited[i])
-                        Dfs(G,i,visited);
-        }
-        cout << endl;
-}
-
-
-//use queue, One floor by one floor
-void Bfs(Linear_graph_without_direction &G)
-{
-        vector<int> visited(G.graph.num_vertexes, 0);
-        vector<int> queue;
-        visited[0] = 1;
-        cout << "v0" << ' ';
-        for(int i = 0; i < G.graph.num_vertexes; i++)
-        {
-                if(G.graph.arc[0][i] != 0)
-                {
-                        queue.push_back(i);
-                        visited[i] = 1;
-                }
-        }
-
-        while(queue.size())
-        {
-                // cout << "queue.size() = "<< queue.size() << endl;
-                int temp = queue.front();
-                queue.erase(queue.begin(),queue.begin()+1);
-                cout << G.graph.list[temp] << ' ';
-                visited[temp] = 1;
-
-                for(int i = 0; i < G.graph.num_vertexes; i++)
-                {
-                        if(G.graph.arc[temp][i] != 0 && visited[i] == 0)
-                        {
-                                queue.push_back(i);
-                                visited[i] = 1;
-                        }
-                }
-
-        }
-
-        cout << endl;
-
-}
-
-
-//The shortest path between a set of selected points and a set of selected points
-void prim (Linear_graph_without_direction& G)
-{
-        vector<int> selected(G.graph.num_vertexes, 0);
-        vector<int> lowcost(G.graph.num_vertexes, INT_MAX);
-        selected[0] = 1;
-        int num_selected = 1;
-        cout << G.graph.list[0];
-        int i = 0, j;
-        while(num_selected != G.graph.num_vertexes)
-        {
-                for(j = 0; j < G.graph.num_vertexes; j++)
-                {
-                        if(G.graph.arc[i][j] != 0 && G.graph.arc[i][j] < lowcost[j] && selected[j] != 1)
-                        {
-                                lowcost[j] = G.graph.arc[i][j];
-                        }
-                }
-                int min = INT_MAX, temp_j;
-                for(j = 0; j < G.graph.num_vertexes; j++)
-                {
-                        if(lowcost[j] < min)
-                        {
-                                min = lowcost[j];
-                                temp_j = j;
-                        }
-                }
-
-                selected[temp_j] = 1;
-                lowcost[temp_j] = INT_MAX;
-                num_selected ++;
-                i = temp_j;
-                cout <<  "->" << G.graph.list[i];                
-
-        }
-        cout << endl;
-
-}
-
 
 //Check if an element is in the array
 int find_num(int num, vector<int>& l)
@@ -233,319 +57,124 @@ int find_num(int num, vector<int>& l)
                         return 0;
         }
         return 1;
-}
-
-
-//first, all edges are sorted according to weights, and small weighted edges that do not form loops are selected
-void kruskal(Linear_graph_without_direction& G)
-{
-        vector<int> begin(G.graph.num_edgs, 0);
-        vector<int> end(G.graph.num_edgs, 0);
-        vector<int> wight(G.graph.num_edgs, 0);
-        vector<vector<int>> temp_arc = G.graph.arc;
-        for(int i = 0; i < G.graph.num_edgs; i++)
-        {
-                int min = INT_MAX;
-                int temp_j = 0, temp_k = 0;
-                for(int j = 0; j < G.graph.num_vertexes; j++)
-                {
-                        for(int k = j; k < G.graph.num_vertexes; k++)
-                        {
-                                if(temp_arc[j][k] <= min && temp_arc[j][k] != 0)
-                                {
-                                        min = temp_arc[j][k];
-                                        temp_j = j;
-                                        temp_k = k;
-                                }
-                        }
-                }
-                begin[i] = temp_j;
-                end[i] = temp_k;
-                wight[i] = min;
-                temp_arc[temp_j][temp_k] = INT_MAX;
-        }
-
-       
-        //Detect whether it is looped or not     
-        vector<int> selected;
-        int num_edgs = 0;
-        for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
-        {
-                if(find_num(begin[i], selected) || find_num(end[i], selected))
-                {
-                        selected.push_back(end[i]);
-                        cout << begin[i] << " > " << end[i] << " = " << wight[i] << endl;
-                        num_edgs ++;
-                }
-        }
-        
-
-}
-
-
-//Get the shortest path from one vertex to the others
-void Dijkstra(string t1, string t2, Linear_graph_without_direction& G)
-{
-        vector<int> verts(G.graph.num_vertexes,0);
-        vector<int> go(G.graph.num_vertexes, INT_MAX);
-        vector<int> last(G.graph.num_vertexes, INT_MAX);
-
-        int v_begin = 0, v_end = 4;
-        
-        verts[v_begin] = 1;
-        go[v_begin] = 0;
-        last[v_begin] = 0;
-        int v_v_begin = v_begin;
-        for(int j = 0; j < G.graph.num_vertexes; j++)
-        {
-                
-                for(int i = 0; i < G.graph.num_vertexes; i++)
-                {
-                        if(G.graph.arc[v_v_begin][i] != 0 && G.graph.arc[v_v_begin][i] + go[v_v_begin] < go[i])
-                        {
-                                go[i] = G.graph.arc[v_v_begin][i] + go[v_v_begin];
-                                last[i] = v_v_begin;
-                                
-                        }
-                }
-
-                int min = INT_MAX;
-                for(int i = 0; i < G.graph.num_vertexes; i++)
-                {
-                        if(go[i] < min && go[i] != 0 && verts[i] == 0)
-                        {
-                                min = go[i];
-                                v_v_begin = i;
-                        }
-                }
-                verts[v_v_begin] = 1;
-                v_begin = v_v_begin;
-
-
-        }
-
-
-}
-
-
-
-void floyd(string t1, string t2, Linear_graph_without_direction& G)
-{
-        vector<vector<int>> arc(G.graph.num_vertexes);
-        vector<vector<int>> path(G.graph.num_vertexes);
-        for(int i = 0; i < G.graph.num_vertexes; i++)
-        {
-                arc[i] = G.graph.arc[i];
-                // for(int j = 0; j < G.graph.num_vertexes; j++)
-                // {
-                //         if(i != j)
-                //                 if(arc[i][j] == 0)
-                //                         arc[i][j] = INT_MAX;
-                // }
-                path[i].resize(G.graph.num_vertexes, -1);
-        }
-
-        vector<vector<int>> vertex_pairs(G.graph.num_vertexes * (G.graph.num_vertexes-1));
-        int a = 0, b = 1;
-        for(int i = 0; i < vertex_pairs.size(); i ++)
-        {
-                vertex_pairs[i].resize(2);
-                if(b > G.graph.num_vertexes - 1)
-                {
-                        a++, b = 0;
-                }   
-                if(a == b)
-                        b += 1;
-                vertex_pairs[i] = {a, b};
-                b++;
-        }
-
-        for(int i = 0; i < G.graph.num_vertexes; i++)
-        {
-                for(int j = 0; j < vertex_pairs.size(); j++)
-                {
-                        if(vertex_pairs[j][0] == i || vertex_pairs[j][1] == i)
-                        {
-                                break;
-                        }
-                        int x1 = arc[vertex_pairs[j][0]][vertex_pairs[j][1]];
-                        int x2 = arc[vertex_pairs[j][0]][i];
-                        int x3 = arc[i][vertex_pairs[j][1]];
-                        if(((x1 == x2) && (x1 == 0)) || ((x1 == x3) && (x1 == 0)))
-                                break;
-                        if(x2 == 0 || x3 == 0)
-                                break;
-                        if(x1 > x2 + x3)
-                        {
-                                arc[vertex_pairs[j][0]][vertex_pairs[j][1]] = x2 + x3; 
-                                path[vertex_pairs[j][0]][vertex_pairs[j][1]] = i;
-                        }       
-                }
-        }
-
-        
-
-}
-
-#endif
-
-
-
-
-
-
-
-//Linear_graph_wight
-#if 2
-
-
-class Linear_graph_wight
-{
-        public:
-                Linear_graph_wight(int n1, int n2);
-                ~Linear_graph_wight();
-        private:
-                linear_graph graph;
-        friend void Dfstraverse(Linear_graph_wight &G);
-        friend void Dfs(Linear_graph_wight &G, int i, vector<int>& visited);
-        friend void Bfs(Linear_graph_wight &G);
-        friend void prim (Linear_graph_wight& G);
-        friend void kruskal(Linear_graph_wight& G);
-        friend void Dijkstra(string t1, string t2, Linear_graph_wight& G);
 };
 
 
-Linear_graph_wight :: Linear_graph_wight(int n1, int n2)
+
+//Linear_graph_without_direction
+class L_G_W
+{
+        public:
+                L_G_W(int n1, int n2);
+                ~L_G_W(){};
+                void Dfs();
+                void Bfs();
+                void prim ();
+                void kruskal();
+                void Dijkstra(string t1, string t2);
+                void floyd(string t1, string t2);
+                void show();
+        protected:
+                linear_graph graph;
+                void Dfstraverse(int i, vector<int>& visited);
+                
+};
+
+
+L_G_W:: L_G_W(int n1,int n2)
 {
         graph.num_vertexes = n1;
         graph.num_edgs = n2;
-
-        graph.arc.resize(n1);
-        for(int i = 0; i < graph.arc.size(); i++)
-        {
-                graph.arc[i].resize(n1);
-                graph.arc[i].assign(n1,0);
-        }
-
         
-
+        //reset the arc[][],and set the initial value;
+        //get vertex
         string temp;
+        graph.arc.resize(graph.num_vertexes);
         for(int i = 0; i < graph.num_vertexes; i++)
         {
+                graph.arc[i].resize(n1);
+                graph.arc[i].assign(n1,int_max);
+                graph.arc[i][i] = 0;
+
+
                 cout << "Please input the vertexe one by one" << endl;
                 cin >> temp;
                 graph.list.push_back(temp);
         }
 
-        //get the wight
+        
+        //Symmetric matrix
+
         for(int i = 0; i < graph.num_edgs; i ++)
         {
-                cout << "Please enter the vertices on both sides of the line and the wight" << endl;
+                cout << "Please enter the vertices on both sides of the line" << endl;
                 string t1, t2;
-                int wight;
-                cin >> t1 >> t2 >> wight;
-                int x = -1, y = -1;
-                for(int j = 0; j < graph.num_vertexes; j++)
-                {
-                        if(graph.list[j] == t1)
-                                x = j;
-                        if(graph.list[j] == t2)
-                                y = j;
-                        if(x != -1 && y != -1) 
-                                break;
-                }
-                if(x == -1 || y== -1)
-                {
-                         cout << "input error" << endl;
-                         break;
-                }
-                else
-                {
-                        graph.arc[x][y] = wight;
-                }
+                int temp;
 
-        }
-};
+                cin >> t1 >> t2 >> temp;
+
+                int x = find_subscript(t1, graph.list);
+                int y = find_subscript(t2, graph.list);
+
+                if(x == -1 || y == -1)
+                {                
+                        cout << "input error: cant find the vertex" << endl;
+                        abort();
+                }
+                graph.arc[x][y] = temp;
+                // graph.arc[y][x] = temp;
 
 
-Linear_graph_wight::  ~Linear_graph_wight()
-{
-        cout <<   "    ";
-        for(int i = 0; i < graph.num_vertexes; i++)
-        {
-                cout << graph.list[i] << "  ";
-        }
-        cout << endl;
-        for(int i = 0; i < graph.list.size(); i++)
-        {
-                cout << graph.list[i] << "  ";
-                for(int j = 0; j < graph.arc[0].size(); j++)
-                {
-                        cout << setw(2) <<  graph.arc[i][j] << "  ";
-                }
-                cout << endl;
         }
 }
 
 
 //DFS traverse the Linear_graph_without_direction
-void Dfs(Linear_graph_wight &G, int i, vector<int>& visited)
+void L_G_W :: Dfstraverse(int i, vector<int>& visited)
 {
         int j; 
         visited[i] = 1;                                         //mark which one has been print
-        cout << G.graph.list[i] << ' ';                         //print the vert
-        for(j = 0; j < G.graph.num_vertexes; j++)
-                if(G.graph.arc[i][j] != 0 && !visited[j])       //One way to the end and then back
-                        Dfs(G,j,visited);
+        cout << graph.list[i] << ' ';                         //print the vert
+        for(j = i+1; j < graph.num_vertexes; j++)
+                if(graph.arc[i][j] != int_max && !visited[j])       //One way to the end and then back
+                        Dfstraverse(j,visited);
 };
 
 
-void Dfstraverse(Linear_graph_wight &G)
+void L_G_W :: Dfs()
 {
-        vector<int> visited(G.graph.num_vertexes, 0);           //mark which one has been print
-        int i;
-        for(i = 0; i < G.graph.num_vertexes; i++)
+        vector<int> visited(graph.num_vertexes, 0);
+        for(int i= 0; i < graph.num_vertexes; i++)
         {
-                if(!visited[i])                                 //if dont print this one
-                        Dfs(G, i, visited);
+                if(!visited[i])
+                        Dfstraverse(i,visited);
         }
         cout << endl;
-};
+}
 
 
 //use queue, One floor by one floor
-void Bfs(Linear_graph_wight &G)
+void L_G_W :: Bfs()
 {
-        vector<int> visited(G.graph.num_vertexes, 0);
-        vector<int> queue;
+        vector<int> visited(graph.num_vertexes, 0);
+        queue<int> q;
+        q.push(0);
         visited[0] = 1;
-        cout << "v0" << ' ';
-        for(int i = 0; i < G.graph.num_vertexes; i++)
-        {
-                if(G.graph.arc[0][i] != 0)
-                {
-                        queue.push_back(i);
-                        visited[i] = 1;
-                }
-        }
+        
 
-        while(queue.size())
+        while(! q.empty())
         {
-                // cout << "queue.size() = "<< queue.size() << endl;
-                int temp = queue.front();
-                queue.erase(queue.begin(),queue.begin()+1);
-                cout << G.graph.list[temp] << ' ';
-                visited[temp] = 1;
-
-                for(int i = 0; i < G.graph.num_vertexes; i++)
+                int temp = q.front();
+                q.pop();
+                cout << graph.list[temp] << ' ';
+                for(int i = temp+1; i < graph.num_vertexes; i++)
                 {
-                        if(G.graph.arc[temp][i] != 0 && visited[i] == 0)
+                        if(graph.arc[temp][i] != int_max && visited[i] == 0)
                         {
-                                queue.push_back(i);
+                                q.push(i);
                                 visited[i] = 1;
-                        }
+                        }    
                 }
-
         }
 
         cout << endl;
@@ -553,29 +182,35 @@ void Bfs(Linear_graph_wight &G)
 }
 
 
-
-//The shortest path between a set of selected points and a set of selected points
-void prim (Linear_graph_wight& G)
+// The shortest path between a set of selected points and a set of selected points
+void L_G_W :: prim ()
 {
-        vector<int> selected(G.graph.num_vertexes, 0);
-        vector<int> lowcost(G.graph.num_vertexes, INT_MAX);
-        selected[0] = 1;
+        vector<int> selected(graph.num_vertexes, 0);            // whether the marker point is selected
+        vector<int> lowcost(graph.num_vertexes, INT_MAX);       // stores possible connection points and weights between two sets
+        vector<int> near_point(graph.num_vertexes, 0);          // save the nearliest point, near_point[i] is close to vertex i
+        
         int num_selected = 1;
-        cout << G.graph.list[0] << ' ';
+        selected[0] = 1;
         int i = 0, j;
-        while(num_selected != G.graph.num_vertexes)
+
+        while(num_selected != graph.num_vertexes)
         {
-                for(j = 0; j < G.graph.num_vertexes; j++)
+                
+                //update the Shortest way;
+                for(j = 0; j < graph.num_vertexes; j++)
                 {
-                        if(G.graph.arc[i][j] != 0 && G.graph.arc[i][j] < lowcost[j] && selected[j] != 1)
+                        if(graph.arc[i][j] != int_max && graph.arc[i][j] < lowcost[j] && !selected[j])
                         {
-                                lowcost[j] = G.graph.arc[i][j];
+                                lowcost[j] = graph.arc[i][j];
+                                near_point[j] = i;
                         }
                 }
+
+                // find the nearliest point
                 int min = INT_MAX, temp_j;
-                for(j = 0; j < G.graph.num_vertexes; j++)
+                for(j = 0; j < graph.num_vertexes; j++)
                 {
-                        if(lowcost[j] < min)
+                        if(lowcost[j] < min && !selected[j])
                         {
                                 min = lowcost[j];
                                 temp_j = j;
@@ -583,10 +218,9 @@ void prim (Linear_graph_wight& G)
                 }
 
                 selected[temp_j] = 1;
-                lowcost[temp_j] = INT_MAX;
                 num_selected ++;
                 i = temp_j;
-                cout << G.graph.list[i] << ' ';                
+                cout << graph.list[near_point[temp_j]] << " -> " << graph.list[i] << "  ";                
 
         }
         cout << endl;
@@ -594,21 +228,22 @@ void prim (Linear_graph_wight& G)
 }
 
 
-
 //first, all edges are sorted according to weights, and small weighted edges that do not form loops are selected
-void kruskal(Linear_graph_wight& G)
+void L_G_W :: kruskal()
 {
-        vector<int> begin(G.graph.num_edgs, 0);
-        vector<int> end(G.graph.num_edgs, 0);
-        vector<int> wight(G.graph.num_edgs, 0);
-        vector<vector<int>> temp_arc = G.graph.arc;
-        for(int i = 0; i < G.graph.num_edgs; i++)
+        vector<int> begin(graph.num_edgs, 0);
+        vector<int> end(graph.num_edgs, 0);
+        vector<int> wight(graph.num_edgs, 0);
+        vector<vector<int>> temp_arc = graph.arc;
+        
+        // sort the degs by the wight
+        for(int i = 0; i < graph.num_edgs; i++)
         {
                 int min = INT_MAX;
                 int temp_j = 0, temp_k = 0;
-                for(int j = 0; j < G.graph.num_vertexes; j++)
+                for(int j = 0; j < graph.num_vertexes; j++)
                 {
-                        for(int k = j; k < G.graph.num_vertexes; k++)
+                        for(int k = j; k < graph.num_vertexes; k++)
                         {
                                 if(temp_arc[j][k] <= min && temp_arc[j][k] != 0)
                                 {
@@ -618,87 +253,167 @@ void kruskal(Linear_graph_wight& G)
                                 }
                         }
                 }
-                begin[i] = temp_j;
-                end[i] = temp_k;
-                wight[i] = min;
+                begin[i] = temp_j, end[i] = temp_k, wight[i] = min;
                 temp_arc[temp_j][temp_k] = INT_MAX;
         }
 
-        
-        //Detect whether it is looped or not 
+       
+        // Detect whether it is looped or not 
+        // add the end to the selected, only one way to the same point   
         vector<int> selected;
         int num_edgs = 0;
-        for(int i = 0; num_edgs != G.graph.num_vertexes -1 && i < G.graph.num_edgs; i++)
+        for(int i = 0; num_edgs < graph.num_vertexes -1; i++)
         {
                 if(find_num(begin[i], selected) || find_num(end[i], selected))
                 {
                         selected.push_back(end[i]);
-                        cout << begin[i] << " > " << end[i] << " = " << wight[i] << endl;
+                        cout << begin[i] << " -> " << end[i] << endl;
                         num_edgs ++;
                 }
-        }    
+        }
+        
 
 }
 
 
-
 //Get the shortest path from one vertex to the others
-void Dijkstra(string t1, string t2, Linear_graph_wight& G)
+void L_G_W :: Dijkstra(string t1, string t2)
 {
-        vector<int> verts(G.graph.num_vertexes,0);
-        vector<int> go(G.graph.num_vertexes, INT_MAX);
-        vector<int> last(G.graph.num_vertexes, INT_MAX);
+        vector<int> verts(graph.num_vertexes,0);                // save the point which is been check
+        vector<int> go(graph.num_vertexes, INT_MAX);            // save the length from the t1 to t2
+        vector<int> last(graph.num_vertexes, INT_MAX);          // save the point pass by
 
-        int v_begin = 0, v_end = 4;
+        int b = find_subscript(t1, graph.list); 
+        int e = find_subscript(t2, graph.list);
         
-        verts[v_begin] = 1;
-        go[v_begin] = 0;
-        last[v_begin] = 0;
-        int v_v_begin = v_begin;
-        for(int j = 0; j < G.graph.num_vertexes; j++)
+        verts[b] = 1;
+        go[b] = 0;
+        last[b] = 0;
+
+
+        int t_b = b;
+        for(int j = 0; j < graph.num_vertexes; j++)
         {
                 
-                for(int i = 0; i < G.graph.num_vertexes; i++)
+                for(int i = 0; i < graph.num_vertexes; i++)
                 {
-                        if(G.graph.arc[v_v_begin][i] != 0 && G.graph.arc[v_v_begin][i] + go[v_v_begin] < go[i])
+                        if(graph.arc[t_b][i] != int_max && graph.arc[t_b][i] + go[t_b] < go[i])
                         {
-                                go[i] = G.graph.arc[v_v_begin][i] + go[v_v_begin];
-                                last[i] = v_v_begin;
+                                go[i] = graph.arc[t_b][i] + go[t_b];
+                                last[i] = t_b;
                                 
                         }
                 }
 
                 int min = INT_MAX;
-                for(int i = 0; i < G.graph.num_vertexes; i++)
+                for(int i = 0; i < graph.num_vertexes; i++)
                 {
-                        if(go[i] < min && go[i] != 0 && verts[i] == 0)
+                        if(go[i] < min && verts[i] == 0)
                         {
                                 min = go[i];
-                                v_v_begin = i;
+                                t_b = i;
                         }
                 }
-                verts[v_v_begin] = 1;
-                v_begin = v_v_begin;
-
-
+                verts[t_b] = 1;
+                b = t_b;
         }
+
+
+        while(last[e] != int_max && last[e] != e)
+        {       
+                cout << graph.list[e] << " <- ";
+                e = last[e];
+        }
+        cout << graph.list[e];
+
+}
+
+
+void L_G_W :: floyd(string t1, string t2)
+{
+        vector<vector<int>> temp_arc = graph.arc;
+        vector<vector<int>> path(graph.num_vertexes);
+        int u, v;
+
+        for(int i = 0; i < graph.num_vertexes; i ++)
+        {
+                path[i].resize(graph.num_vertexes);
+                path[i].assign(graph.num_vertexes,-1);
+                if(graph.list[i] == t1)
+                        u = i;
+                if(graph.list[i] == t2)
+                        v = i;
+        }
+
+//**********************************************************************************************************************************
+        for(int x = 0; x < graph.num_vertexes; x++)
+        {
+                for(int y = 0; y < graph.num_vertexes; y++)
+                {
+                        for(int z = 0; z < graph.num_vertexes; z++)
+                                temp_arc[y][z] > temp_arc[y][x] + temp_arc[x][z] ? temp_arc[y][z] = temp_arc[y][x] + temp_arc[x][z], path[y][z] = x : temp_arc[y][z];
+                }
+        }
+//**********************************************************************************************************************************
+        print_path(u,  v, path, graph.list);
+        cout << t2 << endl;
 
 
 }
 
 
+void L_G_W :: show()
+{
+        //show the arc
+        
+        for(int i = -1; i < graph.num_vertexes; i++)
+        {
+                if(i == -1)
+                {
+                        cout <<   "    ";
+                        for(int j = 0; j < graph.num_vertexes; j++)
+                                cout << graph.list[j] << "  ";
+                        cout << endl;
+                        continue;
+                }
+                for(int j = -1; j < graph.num_vertexes; j++)
+                {
+                        if(j == -1)
+                        {
+                                cout << graph.list[i] << "  ";
+                                continue;
+                        }
+                        if(graph.arc[i][j] == int_max)
+                                cout << " ∞  ";
+                        else
+                                cout << setw(2) <<  graph.arc[i][j] << "  "; 
+                }
+                cout << endl;
+                
+        }
+}
 
+//Linear_graph_wight
 
+class L_G_W_D : public L_G_W
+{
+        public:
+                L_G_W_D(int n1, int n2);
+                ~L_G_W_D(){};
+         
+};
 
-
-
-#endif
-
-
-
-
-
-
+L_G_W_D :: L_G_W_D(int n1, int n2):L_G_W(n1, n2)
+{
+        for(int i = 0; i < graph.num_vertexes; i++)
+        {
+                for(int j = 0; j < graph.num_vertexes; j++)
+                {
+                        if(graph.arc[i][j] != int_max)
+                                graph.arc[j][i] = graph.arc[i][j];
+                }
+        }
+}
 
 
 #endif
