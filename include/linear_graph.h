@@ -393,6 +393,13 @@ void L_G_W :: show()
         }
 }
 
+
+
+
+
+
+
+
 //Linear_graph_wight
 
 class L_G_W_D : public L_G_W
