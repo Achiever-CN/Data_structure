@@ -32,37 +32,30 @@ public:
 
 Link :: Link(ElemType nums[], int len)
 {
-        Link_list *p =  head;
-        for(int i = 0; i < len; i++)
+        Link_list * p = head;
+        if(len > 0)
+                p->data = nums[0];
+        for(int i = 1; i < len; i++)
         {
+                p->next = new Link_list;
+                p = p->next;
                 p->data = nums[i];
-                // cout << p->next << ' ' << p->data << endl;
-                if(i +1 < len)
-                {
-                        p->next = new Link_list;
-                        p = p->next;
-                }
-                
         }
-        rear = p;
-        cout << p->data << endl;
-        p->next = NULL; 
+        p->next = NULL;
 }
 
 
 Link :: ~Link()
 {
-       Link_list* q;
-       Link_list* p = head;
-       while(p)
+        Link_list* p;
+       while(head)
        {
-        q = p->next;
-        delete p;
-        p = q;
+                p = head;
+                head = head->next;
+                delete p;
        } 
        head = NULL;
        p = NULL;
-       q = NULL;
        
 }
 
@@ -81,26 +74,47 @@ void Link::show()
 
 int Link :: insert(int location, ElemType num)
 {
-        Link_list *p = head;
-        Link_list *q = new Link_list;
-        for(int i = 0; i < location; i ++)
+        // Link_list *p = head;
+        // Link_list *q = new Link_list;
+        // for(int i = 0; i < location; i ++)
+        // {
+        //         if(p->next)
+        //         {
+        //                 p = p->next;
+        //         }
+        //         else
+        //         {
+        //                 cout << "error out of range : Link :: insert()"<< endl;
+        //                 return 0;
+        //         }
+        // }
+        // q->data = p->data;
+        // p->data = num;
+        // q->next = p->next;
+        // p->next = q;
+        // return 1;
+        Link_list *p = head->next;
+        if(location == 0)
         {
-                if(p->next)
-                {
-                        p = p->next;
-                }
-                else
-                {
-                        cout << "error out of range : Link :: insert()"<< endl;
-                        return 0;
-                }
+                p = new Link_list;
+                p->data = num;
+                p->next = head;
+                head = p;
+                
         }
-        q->data = p->data;
-        p->data = num;
-        q->next = p->next;
-        p->next = q;
-        return 1;
-
+        for(int i = 1; p; i++)
+        {
+                if(i == location - 1)
+                {
+                        Link_list *q = new Link_list;
+                        q->data = num;
+                        q->next = p->next;
+                        p->next = q;
+                        return 1;
+                }
+                p = p->next;
+        }
+        return 0;
 }
 
 
@@ -116,34 +130,29 @@ void Link :: add(ElemType num)
 int Link :: del(int location)
 {
         Link_list* p = head;
-        
         if(location == 0)
         {
-                Link_list *q = head;
                 head = head->next;
-                delete q;
-                return 1;
-        }
-        else
-        {       
-                Link_list *q = p;
-                for(int i = 0; i < location; i++)
-                {
-                        if(!(p->next))
-                        {
-                                cout << "error out of range : del()" << endl;
-                                return 0;
-                        }
-                        else
-                        {
-                                q = p;
-                                p = p->next;
-                        }
-                }
-                q->next = p->next;
                 delete p;
                 return 1;
         }
+        else
+        {
+                for(int i = 0; p; i++)
+                {
+                        if(i == location - 1)
+                        {
+                                Link_list* q = p->next;
+                                p->next = p->next->next;
+                                delete q;
+                                q = NULL;
+                                return 1;
+                        }
+                        p = p->next;
+                }       
+        }
+
+        return 0;    
 
 }
 
