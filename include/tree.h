@@ -38,7 +38,7 @@ class Tree
 
 Tree :: Tree(Tree_list*& p)
 {
-       ElemType num;
+        ElemType num;
         cin >> num;
         if(num == '#')
                 p = NULL;
@@ -67,14 +67,12 @@ void Tree :: free_tree(Tree_list*& p)
 
 void Tree :: show(Tree_list*& p)
 {
-        if(p)
-        {       if(p->data)
-                        cout << p->data << ' ';
-                else
-                        cout << '#' << ' ';
-                show(p->lchild);
-                show(p->rchild);
-        }
+        if(p == NULL)
+                return;
+        cout << p->data << "  ";
+        show(p->lchild);
+        show(p->rchild);
+        
 }
 
 

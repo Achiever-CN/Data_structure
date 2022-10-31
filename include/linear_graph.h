@@ -61,7 +61,7 @@ int find_num(int num, vector<int>& l)
 
 
 
-//Linear_graph_without_direction
+//Linear_graph_wight
 class L_G_W
 {
         public:
@@ -400,7 +400,7 @@ void L_G_W :: show()
 
 
 
-//Linear_graph_wight
+//Linear_graph_without_direction
 
 class L_G_W_D : public L_G_W
 {
